@@ -2376,20 +2376,68 @@ document.addEventListener('click',function(e){
 </script>
 
 
-<script id="shiftflow-v56-bindings">
+<script id="shiftflow-v57-settings-fix">
 (function(){
- function bindSettings(){
-   const btn=document.getElementById('settingsBtn');
-   if(!btn || btn.dataset.bound==='1') return;
-   btn.dataset.bound='1';
-   btn.addEventListener('click',function(e){
-     e.preventDefault(); e.stopPropagation();
-     if(typeof openSettings==='function') openSettings();
-     else console.error('ShiftFlow: openSettings() is not available');
-   },{passive:false});
- }
- if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindSettings);
- else bindSettings();
+  function hardOpenSettings(){
+    var modal=document.getElementById('modal'), sheet=document.getElementById('sheet');
+    if(!modal || !sheet) return;
+    var dark=localStorage.getItem('shiftflow_settings_dark')==='1';
+    var compact=localStorage.getItem('shiftflow_settings_compact')==='1';
+    sheet.innerHTML='<div class="grab"></div>'+
+      '<button class="close" type="button" id="sfSettingsClose">×</button>'+
+      '<h2>Настройки</h2>'+
+      '<div class="v49-block">'+
+        '<h3>Внешний вид</h3>'+
+        '<label class="row setting-row"><span><b>Тёмная тема</b><span class="meta">Комфортный режим для вечера</span></span><input id="sf-hard-dark" class="v49-switch" type="checkbox" '+(dark?'checked':'')+'></label>'+
+        '<label class="row setting-row"><span><b>Компактный интерфейс</b><span class="meta">Больше информации на экране</span></span><input id="sf-hard-compact" class="v49-switch" type="checkbox" '+(compact?'checked':'')+'></label>'+
+      '</div>'+
+      '<div class="v49-block">'+
+        '<h3>Данные</h3>'+
+        '<div class="v49-note">Ваши данные хранятся локально на устройстве.</div>'+
+        '<button class="v49-action" type="button" id="sfHardExport">↓ Экспортировать резервную копию</button>'+
+      '</div>'+
+      '<div class="actions"><button class="btn secondary" type="button" id="sfHardCancel">Отмена</button><button class="btn primary" type="button" id="sfHardSave">Сохранить</button></div>';
+    modal.classList.add('open');
+    document.getElementById('sfSettingsClose').onclick=function(){modal.classList.remove('open')};
+    document.getElementById('sfHardCancel').onclick=function(){modal.classList.remove('open')};
+    document.getElementById('sfHardSave').onclick=function(){
+      var d=document.getElementById('sf-hard-dark').checked;
+      var k=document.getElementById('sf-hard-compact').checked;
+      localStorage.setItem('shiftflow_settings_dark',d?'1':'0');
+      localStorage.setItem('shiftflow_settings_compact',k?'1':'0');
+      document.documentElement.classList.toggle('sf-dark',d);
+      document.documentElement.classList.toggle('sf-compact',k);
+      modal.classList.remove('open');
+      var toast=document.getElementById('toast');
+      if(toast){toast.textContent='Настройки сохранены';toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},1800)}
+    };
+    document.getElementById('sfHardExport').onclick=function(){
+      var payload={app:'ShiftFlow',version:57,exportedAt:new Date().toISOString(),data:(typeof data!=='undefined'?data:null)};
+      var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+      var url=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=url; a.download='shiftflow-backup-'+new Date().toISOString().slice(0,10)+'.json';
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    };
+  }
+  function bindSettings(){
+    var btn=document.getElementById('settingsBtn');
+    if(!btn || btn.dataset.bound==='1') return;
+    btn.dataset.bound='1';
+    btn.addEventListener('click',function(e){
+      e.preventDefault(); e.stopPropagation();
+      try{
+        if(typeof openSettings==='function'){
+          openSettings();
+          return;
+        }
+      }catch(err){
+        console.error('ShiftFlow openSettings error:',err);
+      }
+      hardOpenSettings();
+    },{passive:false});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindSettings);
+  else bindSettings();
 })();
 </script></body>
 </html>
