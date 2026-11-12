@@ -2278,6 +2278,31 @@ document.addEventListener('click',function(e){
   bindShiftFlowNavigation();
 })();
 </script>
+
+<script>
+(function(){
+  function bindQuickButton(){
+    const btn=document.getElementById('quickBtn');
+    if(!btn || btn.dataset.bound==='1') return;
+    btn.dataset.bound='1';
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof openQuick==='function'){
+        openQuick();
+      }else{
+        console.error('ShiftFlow: openQuick() is not available');
+      }
+    });
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded', bindQuickButton);
+  }else{
+    bindQuickButton();
+  }
+})();
+</script>
+
 </body>
 </html>
 <script>
