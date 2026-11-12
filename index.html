@@ -1,4 +1,4 @@
-<!-- SHIFT_FLOW_BUILD_V55_GITHUB -->
+<!-- SHIFT_FLOW_BUILD_V56_GITHUB -->
 <!doctype html>
 <html lang="ru">
 <head>
@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#6C63FF">
-<title>ShiftFlow v55</title>
+<title>ShiftFlow v56</title>
 <style>
 .screen-toolbar button.active,.tabs button.active{background:#171717;color:#fff;border-color:#171717!important}
 
@@ -837,6 +837,21 @@ function go(v){
  }
  const screen=document.getElementById('screen');
  if(screen)screen.scrollTop=0;
+}
+function notificationDefaults(){
+  return {
+    enabled:true,
+    shiftStart:true,
+    shiftLead:15,
+    shiftEnd:false,
+    shiftEndLead:5,
+    taskReminder:true,
+    taskLead:30,
+    payout:true,
+    payoutLead:1,
+    expenseReminder:false,
+    expenseReminderHour:20
+  };
 }
 function notificationState(){
   data.settings=data.settings||{};
