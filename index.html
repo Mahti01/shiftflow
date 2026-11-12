@@ -680,7 +680,64 @@ button {
 })();
 </script>
 
-</head>
+
+<style id="shiftflow-v56-visual">
+:root{
+ --bg:#f5f6f8;--card:#ffffff;--text:#15171b;--muted:#7b818c;--line:#e7e9ee;
+ --accent:#5b5ce2;--accent-soft:#eeefff;--green:#16865a;--green-soft:#e9f8f0;
+ --red:#d94e5f;--red-soft:#fff0f2;--orange:#bd771b;--orange-soft:#fff5e5;
+ --shadow:0 10px 34px rgba(20,24,40,.055);--r:22px
+}
+body{background:var(--bg)}
+.app{background:var(--bg)}
+header{padding:calc(env(safe-area-inset-top) + 16px) 18px 10px;background:rgba(245,246,248,.92);backdrop-filter:blur(18px);border-bottom:1px solid rgba(231,233,238,.72)}
+.brand{font-size:25px;letter-spacing:-.8px}
+.sub{font-size:12px;margin-top:4px;color:#858b96}
+header .iconbtn{width:42px;height:42px;border-radius:14px;background:#fff;border:1px solid var(--line);box-shadow:0 5px 18px rgba(20,24,40,.06);font-size:19px;color:#555b66}
+header .iconbtn span{display:block;line-height:1}
+#screen{padding:0 16px calc(108px + env(safe-area-inset-bottom))}
+h1{font-size:29px;letter-spacing:-.9px;margin:7px 0 15px}
+h2{font-size:17px;font-weight:850}
+.card,.metric,.item,.work-card,.template-card,.payout-card,.v43-list,.v43-empty,.v47-ranking,.v47-chart,.v47-insight{
+ box-shadow:0 7px 28px rgba(20,24,40,.045);border-color:#e8eaf0
+}
+.metric{padding:15px;border-radius:18px}
+.metric .label{font-size:10px;letter-spacing:.02em;text-transform:uppercase}
+.metric b{font-size:20px}
+.btn{min-height:44px;border-radius:15px;font-size:13px}
+.btn.primary{background:#17191f;color:#fff}
+.btn.secondary{background:var(--accent-soft);color:var(--accent)}
+.btn.ghost{background:#f0f1f4}
+.section{margin:24px 0 10px}
+.section .row{margin-bottom:9px}
+.navbtn{min-height:56px;border-radius:16px;font-size:9px}
+.navbtn.active{background:#eeefff;color:#5556cf}
+.navbtn.plus{height:47px;min-height:47px;margin:4px 2px;background:#17191f;border-radius:16px;box-shadow:0 7px 18px rgba(23,25,31,.16)}
+.bottom{padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(245,246,248,.9);border-top:1px solid rgba(225,227,233,.9)}
+.modal{background:rgba(12,15,22,.42)}
+.sheet{border-radius:28px 28px 0 0;padding:11px 19px calc(25px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(15,18,30,.12)}
+.sheet h2{font-size:22px;letter-spacing:-.4px}
+.field label{font-size:10px;letter-spacing:.02em;text-transform:uppercase}
+input,select,textarea{background:#f3f4f6;border-color:#e5e7eb;border-radius:15px}
+input:focus,select:focus,textarea:focus{background:#fff;box-shadow:0 0 0 3px #5b5ce21a}
+.quick .q{background:#f5f6f8;border-color:#e8eaf0;border-radius:19px;padding:17px}
+.quick .q span{font-size:24px}
+.v50-hero,.v47-hero,.v45-money-hero,.v44-work-hero{border-radius:25px;box-shadow:0 12px 34px rgba(20,24,40,.12)}
+.v50-actions,.dashboard-actions{gap:9px}
+.v50-action,.dashboard-actions button{border-radius:17px}
+.v50-card,.v50-section{border-radius:20px}
+.v46-day,.v46-week,.v46-month{border-radius:18px}
+.cal-cell{border-radius:14px;box-shadow:0 2px 8px rgba(20,24,40,.025)}
+.cal-cell.selected{border-color:#5b5ce2}
+.cal-cell.today .daynum{background:#17191f}
+.work-tabs,.money-tabs,.task-tabs{gap:7px}
+.work-tabs button,.money-tabs button,.task-tabs button{border-color:#e5e7eb;background:#fff;padding:9px 15px}
+.work-tabs button.active,.money-tabs button.active,.task-tabs button.active{background:#17191f}
+.v44-shift,.v44-next,.v45-money-card,.v45-payout,.v47-kpi{border-radius:20px}
+.settings-trigger:active{transform:scale(.94)}
+.sf-dark header,.sf-dark .bottom{background:rgba(18,19,23,.92)}
+.sf-dark .settings-trigger{background:#22242b;border-color:#30333c;color:#fff}
+</style></head>
 <body>
 <div class="app">
 <header>
@@ -689,7 +746,7 @@ button {
       <div class="brand">ShiftFlow</div>
       <div class="sub" id="headerSub">Работа · Деньги · Планы · Напоминания</div>
     </div>
-    <button class="iconbtn" onclick="openSettings()" aria-label="Настройки">⚙︎</button>
+    <button class="iconbtn settings-trigger" id="settingsBtn" type="button" aria-label="Настройки"><span>⚙</span></button>
   </div>
 </header>
 <main id="screen">
@@ -2303,7 +2360,23 @@ document.addEventListener('click',function(e){
 })();
 </script>
 
-</body>
+
+<script id="shiftflow-v56-bindings">
+(function(){
+ function bindSettings(){
+   const btn=document.getElementById('settingsBtn');
+   if(!btn || btn.dataset.bound==='1') return;
+   btn.dataset.bound='1';
+   btn.addEventListener('click',function(e){
+     e.preventDefault(); e.stopPropagation();
+     if(typeof openSettings==='function') openSettings();
+     else console.error('ShiftFlow: openSettings() is not available');
+   },{passive:false});
+ }
+ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',bindSettings);
+ else bindSettings();
+})();
+</script></body>
 </html>
 <script>
 try{applyAppearance();}catch(e){}
