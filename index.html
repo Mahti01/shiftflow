@@ -737,6 +737,9 @@ input:focus,select:focus,textarea:focus{background:#fff;box-shadow:0 0 0 3px #5b
 .settings-trigger:active{transform:scale(.94)}
 .sf-dark header,.sf-dark .bottom{background:rgba(18,19,23,.92)}
 .sf-dark .settings-trigger{background:#22242b;border-color:#30333c;color:#fff}
+
+/* v58 — Today / Day Hub */
+.v58-result{background:linear-gradient(135deg,#17181c,#292b32);color:#fff;border-radius:24px;padding:22px;margin:12px 0}.v58-result .eyebrow{color:#aeb3bd;font-size:10px;font-weight:900;letter-spacing:.08em}.v58-result-value{font-size:36px;font-weight:950;letter-spacing:-.04em;margin:8px 0}.v58-result-sub{display:flex;gap:16px;color:#c7cad1;font-size:13px}.v58-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.v58-kpis>div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 10px;min-width:0}.v58-kpis span{display:block;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.04em}.v58-kpis b{display:block;font-size:17px;margin-top:5px;white-space:nowrap}.v58-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 18px}.v58-actions button{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 5px;font-weight:800;color:var(--text)}.v58-actions span{display:block;font-size:18px;margin-bottom:3px}.v58-section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;margin:12px 0}.v58-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.v58-head b{font-size:16px}.v58-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-head button{border:0;background:transparent;color:var(--accent);font-weight:800}.v58-timeline{display:flex;flex-direction:column}.v58-timeline-item{display:grid;grid-template-columns:62px 24px 1fr auto;gap:8px;align-items:center;width:100%;border:0;background:transparent;padding:10px 0;text-align:left;color:var(--text)}.v58-time{font-size:12px;font-weight:900;color:var(--muted);align-self:start;padding-top:2px}.v58-line{height:100%;display:flex;justify-content:center;position:relative}.v58-line:after{content:'';position:absolute;top:22px;bottom:-10px;width:2px;background:var(--line)}.v58-timeline-item:last-child .v58-line:after{display:none}.v58-line span{z-index:1;width:24px;height:24px;border-radius:999px;background:var(--bg);display:grid;place-items:center;font-size:11px}.v58-main b{display:block;font-size:14px}.v58-main small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-timeline-item strong{font-size:12px;white-space:nowrap}.v58-finance{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.v58-finance>div{background:var(--bg);border-radius:14px;padding:12px}.v58-finance span{display:block;color:var(--muted);font-size:10px}.v58-finance b{display:block;margin-top:5px;font-size:14px}.v58-task{width:100%;display:flex;gap:10px;align-items:center;border:0;border-top:1px solid var(--line);background:transparent;padding:12px 0;text-align:left;color:var(--text)}.v58-task b{display:block;font-size:13px}.v58-task small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-free{display:flex;gap:12px;align-items:center;background:var(--bg);border-radius:16px;padding:14px}.v58-free b{display:block}.v58-free small{display:block;color:var(--muted);font-size:11px;margin-top:3px}@media(max-width:390px){.v58-kpis{grid-template-columns:repeat(2,1fr)}.v58-actions{grid-template-columns:repeat(2,1fr)}.v58-finance{grid-template-columns:1fr}.v58-result-value{font-size:32px}}
 </style></head>
 <body>
 <div class="app">
@@ -2121,7 +2124,7 @@ function renderCalendar(){
    const x=dayData(d);
    const inc=x.shifts.reduce((s,v)=>s+moneyNum(shiftIncome(v)),0);
    const exp=(data.expenses||[]).filter(v=>v.date===d).reduce((s,v)=>s+moneyNum(v.amount),0);
-   const extra=(data.incomes||data.income||[]).filter(v=>v.date===d).reduce((s,v)=>s+moneyNum(v.amount),0);
+   const extra=(data.income||[]).filter(v=>v.date===d).reduce((s,v)=>s+moneyNum(v.amount),0);
    return {income:inc+extra,expense:exp,net:inc+extra-exp};
  };
 
@@ -2143,46 +2146,20 @@ function renderCalendar(){
  if(mode==='day'){
    const x=dayData(selected), n=dayNet(selected);
    const dateTitle=selected===todayISO()?'Сегодня':dateObj(selected).toLocaleDateString('ru-RU',{weekday:'long',day:'numeric',month:'long'});
-   root.innerHTML=`
-   ${nav(dateTitle,formatDate(selected))}
-   ${switcher}
-   <div class="v46-day-hub">
-     <div class="eyebrow">ЧИСТЫЙ РЕЗУЛЬТАТ</div>
-     <div class="net">${money(n.net)} </div>
-     <div class="sub">Доходы ${money(n.income)}  · Расходы ${money(n.expense)} </div>
-   </div>
-   <div class="v46-day-summary">
-     <div class="v46-day-kpi"><span>СМЕНЫ</span><b>${x.shifts.length}</b></div>
-     <div class="v46-day-kpi"><span>ЗАДАЧИ</span><b>${x.tasks.filter(t=>!t.done).length}</b></div>
-     <div class="v46-day-kpi"><span>СОБЫТИЯ</span><b>${x.events.length}</b></div>
-     <div class="v46-day-kpi"><span>ЧАСЫ</span><b>${x.shifts.reduce((s,v)=>s+hoursOfShift(v),0).toFixed(1)}</b></div>
-   </div>
-
-   <div class="v46-day-section"><div class="v46-day-section-head"><b>Работа</b><span>${x.shifts.length}</span></div>
-   ${x.shifts.length?x.shifts.map(s=>`<div class="v46-item" onclick="openShift('${s.id}')"><div class="icon">▣</div><div class="v46-item-main"><div class="v46-item-title">${esc(employerById(s.employerId||s.employer)?.name||'Смена')}</div><div class="v46-item-meta">${esc(shiftStart(s))}–${esc(shiftEnd(s))} · ${hoursOfShift(s).toFixed(1)} ч</div></div><div class="v46-item-value">${money(shiftIncome(s))} </div></div>`).join(''):`<div class="empty-line">Смен нет</div>`}
-   </div>
-
-   <div class="v46-day-section"><div class="v46-day-section-head"><b>Доходы</b><span>${n.income?money(n.income)+' &#x20BD;':''}</span></div>
-   ${x.shifts.length?x.shifts.map(s=>`<div class="v46-item"><div class="icon">&#x20BD;</div><div class="v46-item-main"><div class="v46-item-title">Смена</div><div class="v46-item-meta">${esc(employerById(s.employerId||s.employer)?.name||'Работа')}</div></div><div class="v46-item-value green">+${money(shiftIncome(s))} </div></div>`).join(''):''}
-   ${n.income===0?`<div class="empty-line">Доходов нет</div>`:''}
-   </div>
-
-   <div class="v46-day-section"><div class="v46-day-section-head"><b>Расходы</b><span>${n.expense?money(n.expense)+' &#x20BD;':''}</span></div>
-   ${((data.expenses||[]).filter(e=>e.date===selected).length)?(data.expenses||[]).filter(e=>e.date===selected).map(e=>`<div class="v46-item"><div class="icon">−</div><div class="v46-item-main"><div class="v46-item-title">${esc(e.description||expenseCategoryLabel(e.category))}</div><div class="v46-item-meta">${esc(expenseCategoryLabel(e.category))}${e.paymentMethod?' · '+esc(e.paymentMethod):''}</div></div><div class="v46-item-value red">−${money(e.amount)} </div></div>`).join(''):`<div class="empty-line">Расходов нет</div>`}
-   </div>
-
-   <div class="v46-day-section"><div class="v46-day-section-head"><b>Задачи</b><span>${x.tasks.filter(t=>!t.done).length}</span></div>
-   ${x.tasks.length?x.tasks.map(t=>`<div class="v46-item" onclick="openTask('${t.id}')"><div class="icon">${t.done?'✓':'○'}</div><div class="v46-item-main"><div class="v46-item-title ${t.done?'strike':''}">${esc(t.title)}</div><div class="v46-item-meta">${t.time||'Без времени'} · ${taskCategoryLabel(t.category)}</div></div></div>`).join(''):`<div class="empty-line">Задач нет</div>`}
-   </div>
-
-   <div class="v46-day-section"><div class="v46-day-section-head"><b>События</b><span>${x.events.length}</span></div>
-   ${x.events.length?x.events.map(e=>`<div class="v46-item" onclick="openEvent('${e.id}')"><div class="icon">◷</div><div class="v46-item-main"><div class="v46-item-title">${esc(e.title)}</div><div class="v46-item-meta">${e.time||'Без времени'} · ${eventCategoryLabel(e.category)}</div></div></div>`).join(''):`<div class="empty-line">Событий нет</div>`}
-   </div>
-
-   <div class="v46-quick"><button onclick="openShift()">＋ Смена</button><button onclick="openIncome()">&#x20BD; Доход</button><button onclick="openQuickExpense()">− Расход</button><button onclick="openTask()">✓ Задача</button></div>`;
+   const timeline=[...x.shifts.map(s=>({kind:'shift',time:shiftStart(s),end:shiftEnd(s),title:employerById(s.employerId||s.employer)?.name||'Смена',meta:hoursOfShift(s).toFixed(1)+' ч',value:shiftIncome(s),id:s.id})),...x.events.filter(e=>e.time).map(e=>({kind:'event',time:e.time,end:'',title:e.title,meta:eventCategoryLabel(e.category),id:e.id})),...x.tasks.filter(t=>!t.done&&t.time).map(t=>({kind:'task',time:t.time,end:'',title:t.title,meta:taskCategoryLabel(t.category),id:t.id}))].sort((a,b)=>String(a.time).localeCompare(String(b.time)));
+   const timelineHtml=timeline.length?timeline.map(i=>{const cls=i.kind==='shift'?'shift':i.kind==='task'?'task':'event';const icon=i.kind==='shift'?'▣':i.kind==='task'?'✓':'◷';const click=i.kind==='shift'?'openShift(\''+i.id+'\')':i.kind==='task'?'openTask(\''+i.id+'\')':'openEvent(\''+i.id+'\')';return '<button class="v58-timeline-item '+cls+'" onclick="'+click+'"><div class="v58-time">'+esc(i.time)+(i.end?'–'+esc(i.end):'')+'</div><div class="v58-line"><span>'+icon+'</span></div><div class="v58-main"><b>'+esc(i.title)+'</b><small>'+esc(i.meta||'')+'</small></div>'+(i.value!=null?'<strong>'+money(i.value)+' </strong>':'')+'</button>'}).join(''):'<div class="empty-line">На этот день ничего не запланировано.</div>';
+   const freeMin=dailyFreeMinutes(selected);
+   root.innerHTML=nav(dateTitle,formatDate(selected))+switcher+
+     '<div class="v58-result"><div class="eyebrow">ЧИСТЫЙ РЕЗУЛЬТАТ</div><div class="v58-result-value">'+money(n.net)+' </div><div class="v58-result-sub"><span>Доход '+money(n.income)+' </span><span>Расходы '+money(n.expense)+' </span></div></div>'+
+     '<div class="v58-kpis"><div><span>СМЕНЫ</span><b>'+x.shifts.length+'</b></div><div><span>ЗАДАЧИ</span><b>'+x.tasks.filter(t=>!t.done).length+'</b></div><div><span>СОБЫТИЯ</span><b>'+x.events.length+'</b></div><div><span>СВОБОДНО</span><b>'+freeTimeLabel(freeMin)+'</b></div></div>'+
+     '<div class="v58-actions"><button onclick="openShift(null,\''+selected+'\')"><span>＋</span>Смена</button><button onclick="openIncome(null,\''+selected+'\')"><span>₽</span>Доход</button><button onclick="openQuickExpense()"><span>−</span>Расход</button><button onclick="openTask(null,\''+selected+'\')"><span>✓</span>Задача</button></div>'+
+     '<div class="v58-section"><div class="v58-head"><div><b>План дня</b><small>'+timeline.length+' событий</small></div><button onclick="state.calendarMode=\'plan\';window.calendarMode=\'plan\';renderCalendar()">Умный план</button></div><div class="v58-timeline">'+timelineHtml+'</div></div>'+
+     '<div class="v58-section"><div class="v58-head"><div><b>Финансы</b><small>За '+dateObj(selected).toLocaleDateString('ru-RU',{day:'numeric',month:'long'})+'</small></div><button onclick="openQuickExpense()">+ Расход</button></div><div class="v58-finance"><div><span>Доход</span><b class="green">+'+money(n.income)+' </b></div><div><span>Расходы</span><b class="red">−'+money(n.expense)+' </b></div><div><span>Итог</span><b>'+money(n.net)+' </b></div></div></div>'+
+     '<div class="v58-section"><div class="v58-head"><div><b>Задачи</b><small>'+(x.tasks.filter(t=>!t.done).length?'Нужно сделать сегодня':'Всё выполнено')+'</small></div><button onclick="openTask(null,\''+selected+'\')">+ Задача</button></div>'+(x.tasks.filter(t=>!t.done).length?x.tasks.filter(t=>!t.done).slice(0,5).map(t=>'<button class="v58-task" onclick="openTask(\''+t.id+'\')"><span>○</span><div><b>'+esc(t.title)+'</b><small>'+(t.time?esc(t.time)+' · ':'')+taskCategoryLabel(t.category)+'</small></div></button>').join(''):'<div class="empty-line">Задач на этот день нет.</div>')+'</div>'+
+     '<div class="v58-section"><div class="v58-head"><div><b>Свободное время</b><small>'+freeTimeLabel(freeMin)+' доступно</small></div><button onclick="openSmartTaskPlanner(\''+selected+'\')">Запланировать</button></div>'+(freeMin?'<div class="v58-free"><span>◷</span><div><b>'+freeTimeLabel(freeMin)+'</b><small>с учётом вашего рабочего дня и занятых блоков</small></div></div>':'<div class="empty-line">Свободных окон не найдено.</div>')+'</div>'+
+     '<div class="v46-quick"><button onclick="calendarMove(-1)">‹ Предыдущий день</button><button onclick="selectCalendarDate(todayISO());state.calendarMode=\'day\';window.calendarMode=\'day\';renderCalendar()">Сегодня</button><button onclick="calendarMove(1)">Следующий день ›</button></div>';
    return;
  }
-
  if(mode==='week'){
    const base=dateObj(selected), day=base.getDay()||7;
    base.setDate(base.getDate()-day+1);
@@ -2477,7 +2454,7 @@ document.addEventListener('click',function(e){
       if(toast){toast.textContent='Настройки сохранены';toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},1800)}
     };
     document.getElementById('sfHardExport').onclick=function(){
-      var payload={app:'ShiftFlow',version:57,exportedAt:new Date().toISOString(),data:(typeof data!=='undefined'?data:null)};
+      var payload={app:'ShiftFlow',version:58,exportedAt:new Date().toISOString(),data:(typeof data!=='undefined'?data:null)};
       var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
       var url=URL.createObjectURL(blob), a=document.createElement('a');
       a.href=url; a.download='shiftflow-backup-'+new Date().toISOString().slice(0,10)+'.json';
