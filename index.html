@@ -1640,7 +1640,7 @@ function saveRotation(id){
   const breakMin=Number(document.getElementById('rotBreak').value||0);
   const created=createRotationShifts(start,days,pattern,emp,timeStart,timeEnd,breakMin);
   data.rotations=data.rotations||[];
-  const obj={id:id||uid(),name:${JSON.stringify('График')},pattern:patternName,schedule:patternName,from:start,to:addDaysISO(start,days-1),employerId:emp,start:timeStart,end:timeEnd,break:breakMin};
+  const obj={id:id||uid(),name:'График',pattern:patternName,schedule:patternName,from:start,to:addDaysISO(start,days-1),employerId:emp,start:timeStart,end:timeEnd,break:breakMin};
   if(id){
     const i=data.rotations.findIndex(x=>x.id===id);
     if(i>=0)data.rotations[i]={...data.rotations[i],...obj};
