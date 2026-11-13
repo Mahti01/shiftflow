@@ -783,14 +783,20 @@ function taskDueState(t){if(t.done)return 'done';if(!t.date)return 'open';return
 function addDaysISO(date,days){const d=new Date(date+'T12:00:00');d.setDate(d.getDate()+Number(days||0));return d.toISOString().slice(0,10);}
 function deleteTask(id){data.tasks=(data.tasks||[]).filter(x=>x.id!==id);save();closeModal();renderTasks();showToast('Задача удалена');}
 function rotationLabel(r){return r?.pattern||r?.schedule||'График';}
-function openRotation(id){showToast('Редактирование ротации доступно при создании следующей версии');}
-function extendRotation(id,days){const r=(data.rotations||[]).find(x=>x.id===id);if(!r){showToast('Ротация не найдена');return;}showToast(`Ротация продлена на ${days} дней`);}
+function openRotation(id){openRotationForm(id);}
+function extendRotation(id,days){
+  const r=(data.rotations||[]).find(x=>x.id===id);
+  if(!r){showToast('Ротация не найдена');return;}
+  const start=addDaysISO(r.to,1);
+  const created=createRotationShifts(start,Number(days||30),schedulePattern(r.pattern||r.schedule),r.employerId,r.start,r.end,r.break);
+  r.to=addDaysISO(r.to,Number(days||30));
+  save();renderWork();showToast(`Ротация продлена · добавлено смен: ${created.length}`);
+}
 
 const daysInMonth=(y,m)=>new Date(y,m+1,0).getDate();
 const firstDow=(y,m)=>(new Date(y,m,1).getDay()+6)%7;
 let data=load();
 if(!Array.isArray(data.income)) data.income=[];
-if(!Array.isArray(data.rotations)) data.rotations=[];
 if(!Array.isArray(data.rotations)) data.rotations=[];
 let state={view:'calendar',selectedDate:todayISO(),month:new Date().getMonth(),year:new Date().getFullYear(),calMode:'month',editing:null};
 
@@ -808,7 +814,34 @@ function seed(){
  categories:['Еда','Транспорт','Покупки','Здоровье','Развлечения','Дом','Подписки','Другое']
  };
 }
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x)return x}catch(e){};const x=seed();localStorage.setItem(KEY,JSON.stringify(x));return x}
+function load(){
+  try{
+    const x=JSON.parse(localStorage.getItem(KEY));
+    if(x){
+      x.employers=Array.isArray(x.employers)?x.employers:[];
+      x.shifts=Array.isArray(x.shifts)?x.shifts:[];
+      x.expenses=Array.isArray(x.expenses)?x.expenses:[];
+      x.tasks=Array.isArray(x.tasks)?x.tasks:[];
+      x.events=Array.isArray(x.events)?x.events:[];
+      x.income=Array.isArray(x.income)?x.income:[];
+      if(Array.isArray(x.incomes) && x.incomes.length){
+        x.income=x.income.concat(x.incomes);
+      }
+      delete x.incomes;
+      x.shifts=x.shifts.map(s=>({...s,
+        start:s.start||s.startTime||'',
+        end:s.end||s.endTime||'',
+        startTime:s.startTime||s.start||'',
+        endTime:s.endTime||s.end||''
+      }));
+      if(!Array.isArray(x.rotations))x.rotations=[];
+      if(!Array.isArray(x.shiftTemplates))x.shiftTemplates=[];
+      if(!Array.isArray(x.categories))x.categories=['Еда','Транспорт','Покупки','Здоровье','Развлечения','Дом','Подписки','Другое'];
+      return x;
+    }
+  }catch(e){}
+  const x=seed();localStorage.setItem(KEY,JSON.stringify(x));return x
+}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
 function employer(id){return data.employers.find(x=>x.id===id)}
 function totalForDate(date){
@@ -1539,7 +1572,8 @@ function openShift(date,id){
 function saveShift(id){
  data.shifts=data.shifts||[];
  const empId=document.getElementById('shiftEmployer').value, emp=employerById(empId);
- const x={id:id||uid(),employerId:empId,date:document.getElementById('shiftDate').value,startTime:document.getElementById('shiftStart').value,endTime:document.getElementById('shiftEnd').value,break:Number(document.getElementById('shiftBreak').value||0),hourlyRate:Number(document.getElementById('shiftRate').value||(emp?.payType==='hourly'?emp.rate:0)),fixedIncome:document.getElementById('shiftFixed').value===''?'':Number(document.getElementById('shiftFixed').value),notes:document.getElementById('shiftNote').value};
+ const startTime=document.getElementById('shiftStart').value, endTime=document.getElementById('shiftEnd').value;
+ const x={id:id||uid(),employerId:empId,date:document.getElementById('shiftDate').value,start:startTime,end:endTime,startTime,endTime,break:Number(document.getElementById('shiftBreak').value||0),hourlyRate:Number(document.getElementById('shiftRate').value||(emp?.payType==='hourly'?emp.rate:0)),fixedIncome:document.getElementById('shiftFixed').value===''?'':Number(document.getElementById('shiftFixed').value),notes:document.getElementById('shiftNote').value};
  x.calculatedIncome=calcShiftIncome(x); x.income=x.calculatedIncome;
  if(id){const i=data.shifts.findIndex(s=>s.id===id);if(i>=0)data.shifts[i]={...data.shifts[i],...x};} else data.shifts.push(x);
  save();closeModal();state.selectedDate=x.date;render();showToast(`Смена сохранена · ${money(x.calculatedIncome)} `);
@@ -1560,32 +1594,62 @@ function createRotationShifts(startDate, days, pattern, employerId, startTime, e
     const d=new Date(base); d.setDate(d.getDate()+i);
     const date=d.toISOString().slice(0,10);
     if(data.shifts.some(s=>s.date===date && String(s.employerId||s.employer)===String(employerId))) continue;
-    const x={id:uid(),employerId,date,startTime,endTime,break:Number(breakMin||0),hourlyRate:emp?.payType==='hourly'?Number(emp.rate||0):0,fixedIncome:emp?.payType==='shift'?Number(emp.rate||0):'',notes:'',rotation:true};
+    const x={id:uid(),employerId,date,start:startTime,end:endTime,startTime,endTime,break:Number(breakMin||0),hourlyRate:emp?.payType==='hourly'?Number(emp.rate||0):0,fixedIncome:emp?.payType==='shift'?Number(emp.rate||0):'',notes:'',rotation:true};
     x.calculatedIncome=calcShiftIncome(x); x.income=x.calculatedIncome;
     data.shifts.push(x); created.push(x);
   }
   save(); render();
   return created;
 }
-function openRotationForm(){
+function openRotationForm(id){
+  const r=id?(data.rotations||[]).find(x=>x.id===id):null;
   const emps=data.employers||[];
-  openModal(`<button class="close" onclick="closeModal()">×</button><h2>Создать график</h2>
-    <div class="field"><label>Работодатель</label><select id="rotEmployer">${emps.length?emps.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join(''):'<option value="">Сначала добавьте работодателя</option>'}</select></div>
-    <div class="field"><label>График</label><select id="rotPattern"><option value="2/2">2/2</option><option value="3/3">3/3</option><option value="5/2">5/2</option></select></div>
-    <div class="field"><label>Начальная дата</label><input id="rotStart" type="date" value="${state.selectedDate||todayISO()}"></div>
-    <div class="field"><label>Создать на период</label><select id="rotDays"><option value="30">30 дней</option><option value="60">60 дней</option><option value="90">90 дней</option><option value="180">180 дней</option></select></div>
-    <div class="field"><label>Начало</label><input id="rotTimeStart" type="time" value="10:00"></div>
-    <div class="field"><label>Конец</label><input id="rotTimeEnd" type="time" value="22:00"></div>
-    <div class="field"><label>Перерыв, минут</label><input id="rotBreak" type="number" value="60" min="0"></div>
-    <div class="actions"><button class="btn primary" onclick="saveRotation()">Создать смены</button></div>
-    <div class="meta" style="margin-top:10px">Уже существующие смены этого работодателя не будут дублироваться.</div>`);
+  const pattern=r?.pattern||'2/2';
+  const start=r?.from||state.selectedDate||todayISO();
+  const days=r?Math.max(1,Math.round((new Date(r.to+'T12:00:00')-new Date(r.from+'T12:00:00'))/86400000)+1):30;
+  openModal(`<button class="close" onclick="closeModal()">×</button><h2>${r?'Изменить график':'Создать график'}</h2>
+    <div class="field"><label>Работодатель</label><select id="rotEmployer">${emps.length?emps.map(e=>`<option value="${e.id}" ${e.id===r?.employerId?'selected':''}>${esc(e.name)}</option>`).join(''):'<option value="">Сначала добавьте работодателя</option>'}</select></div>
+    <div class="field"><label>График</label><select id="rotPattern">
+      <option value="2/2" ${pattern==='2/2'?'selected':''}>2/2</option>
+      <option value="3/3" ${pattern==='3/3'?'selected':''}>3/3</option>
+      <option value="5/2" ${pattern==='5/2'?'selected':''}>5/2</option>
+    </select></div>
+    <div class="field"><label>Начальная дата</label><input id="rotStart" type="date" value="${start}"></div>
+    <div class="field"><label>Создать на период</label><select id="rotDays">
+      <option value="30" ${days===30?'selected':''}>30 дней</option>
+      <option value="60" ${days===60?'selected':''}>60 дней</option>
+      <option value="90" ${days===90?'selected':''}>90 дней</option>
+      <option value="180" ${days===180?'selected':''}>180 дней</option>
+    </select></div>
+    <div class="field"><label>Начало</label><input id="rotTimeStart" type="time" value="${r?.start||'10:00'}"></div>
+    <div class="field"><label>Конец</label><input id="rotTimeEnd" type="time" value="${r?.end||'22:00'}"></div>
+    <div class="field"><label>Перерыв, минут</label><input id="rotBreak" type="number" value="${r?.break??60}" min="0"></div>
+    <div class="actions"><button class="btn primary" onclick="saveRotation('${id||''}')">${r?'Сохранить изменения':'Создать смены'}</button></div>
+    ${r?`<div class="actions"><button class="btn danger" onclick="deleteRotation('${r.id}')">Удалить график</button></div>`:''}
+    <div class="meta" style="margin-top:10px">Существующие смены не дублируются.</div>`);
 }
-function saveRotation(){
+function saveRotation(id){
   const emp=document.getElementById('rotEmployer').value;
-  const pattern=schedulePattern(document.getElementById('rotPattern').value);
+  const patternName=document.getElementById('rotPattern').value;
+  const pattern=schedulePattern(patternName);
   if(!emp||!pattern.length){showToast('Выберите работодателя');return;}
-  const created=createRotationShifts(document.getElementById('rotStart').value,Number(document.getElementById('rotDays').value),pattern,emp,document.getElementById('rotTimeStart').value,document.getElementById('rotTimeEnd').value,Number(document.getElementById('rotBreak').value||0));
-  closeModal(); showToast(`Добавлено смен: ${created.length}`);
+  const start=document.getElementById('rotStart').value;
+  const days=Number(document.getElementById('rotDays').value);
+  const timeStart=document.getElementById('rotTimeStart').value;
+  const timeEnd=document.getElementById('rotTimeEnd').value;
+  const breakMin=Number(document.getElementById('rotBreak').value||0);
+  const created=createRotationShifts(start,days,pattern,emp,timeStart,timeEnd,breakMin);
+  data.rotations=data.rotations||[];
+  const obj={id:id||uid(),name:${JSON.stringify('График')},pattern:patternName,schedule:patternName,from:start,to:addDaysISO(start,days-1),employerId:emp,start:timeStart,end:timeEnd,break:breakMin};
+  if(id){
+    const i=data.rotations.findIndex(x=>x.id===id);
+    if(i>=0)data.rotations[i]={...data.rotations[i],...obj};
+  }else data.rotations.push(obj);
+  save();closeModal();renderWork();showToast(`${id?'График обновлён':'Создано смен'}: ${created.length}`);
+}
+function deleteRotation(id){
+  data.rotations=(data.rotations||[]).filter(x=>x.id!==id);
+  save();closeModal();renderWork();showToast('График удалён');
 }
 
 /* v28 — financial flow */
@@ -1648,6 +1712,7 @@ function markShiftReceived(id){
   const existing=data.income.find(x=>x.shiftId===id);
   if(existing){existing.status='received';existing.date=todayISO();}
   else data.income.push({id:uid(),shiftId:id,amount:shiftIncome(s),date:todayISO(),status:'received',source:'shift',sourceName:employerById(s.employerId)?.name||'Работа'});
+  s.received=true;
   save();render();showToast('Выплата отмечена как полученная');
 }
 function openMoneyPeriod(){
