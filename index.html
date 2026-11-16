@@ -1,4 +1,4 @@
-<!-- SHIFT_FLOW_BUILD_V57_SETTINGS_FIX -->
+<!-- SHIFT_FLOW_BUILD_V59_WEEKLY_TIMELINE -->
 <!doctype html>
 <html lang="ru">
 <head>
@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#6C63FF">
-<title>ShiftFlow v56</title>
+<title>ShiftFlow v59</title>
 <style>
 .screen-toolbar button.active,.tabs button.active{background:#171717;color:#fff;border-color:#171717!important}
 
@@ -740,6 +740,28 @@ input:focus,select:focus,textarea:focus{background:#fff;box-shadow:0 0 0 3px #5b
 
 /* v58 — Today / Day Hub */
 .v58-result{background:linear-gradient(135deg,#17181c,#292b32);color:#fff;border-radius:24px;padding:22px;margin:12px 0}.v58-result .eyebrow{color:#aeb3bd;font-size:10px;font-weight:900;letter-spacing:.08em}.v58-result-value{font-size:36px;font-weight:950;letter-spacing:-.04em;margin:8px 0}.v58-result-sub{display:flex;gap:16px;color:#c7cad1;font-size:13px}.v58-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0}.v58-kpis>div{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 10px;min-width:0}.v58-kpis span{display:block;color:var(--muted);font-size:9px;font-weight:900;letter-spacing:.04em}.v58-kpis b{display:block;font-size:17px;margin-top:5px;white-space:nowrap}.v58-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 18px}.v58-actions button{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 5px;font-weight:800;color:var(--text)}.v58-actions span{display:block;font-size:18px;margin-bottom:3px}.v58-section{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:15px;margin:12px 0}.v58-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.v58-head b{font-size:16px}.v58-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-head button{border:0;background:transparent;color:var(--accent);font-weight:800}.v58-timeline{display:flex;flex-direction:column}.v58-timeline-item{display:grid;grid-template-columns:62px 24px 1fr auto;gap:8px;align-items:center;width:100%;border:0;background:transparent;padding:10px 0;text-align:left;color:var(--text)}.v58-time{font-size:12px;font-weight:900;color:var(--muted);align-self:start;padding-top:2px}.v58-line{height:100%;display:flex;justify-content:center;position:relative}.v58-line:after{content:'';position:absolute;top:22px;bottom:-10px;width:2px;background:var(--line)}.v58-timeline-item:last-child .v58-line:after{display:none}.v58-line span{z-index:1;width:24px;height:24px;border-radius:999px;background:var(--bg);display:grid;place-items:center;font-size:11px}.v58-main b{display:block;font-size:14px}.v58-main small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-timeline-item strong{font-size:12px;white-space:nowrap}.v58-finance{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.v58-finance>div{background:var(--bg);border-radius:14px;padding:12px}.v58-finance span{display:block;color:var(--muted);font-size:10px}.v58-finance b{display:block;margin-top:5px;font-size:14px}.v58-task{width:100%;display:flex;gap:10px;align-items:center;border:0;border-top:1px solid var(--line);background:transparent;padding:12px 0;text-align:left;color:var(--text)}.v58-task b{display:block;font-size:13px}.v58-task small{display:block;color:var(--muted);font-size:11px;margin-top:3px}.v58-free{display:flex;gap:12px;align-items:center;background:var(--bg);border-radius:16px;padding:14px}.v58-free b{display:block}.v58-free small{display:block;color:var(--muted);font-size:11px;margin-top:3px}@media(max-width:390px){.v58-kpis{grid-template-columns:repeat(2,1fr)}.v58-actions{grid-template-columns:repeat(2,1fr)}.v58-finance{grid-template-columns:1fr}.v58-result-value{font-size:32px}}
+
+/* ShiftFlow v59 — weekly 00:00–24:00 timeline */
+.v59-week-note{font-size:11px;color:var(--muted);margin:8px 2px 10px}
+.v59-week-scroll{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:18px;background:#fff}
+.v59-week{display:grid;grid-template-columns:52px repeat(7,128px);min-width:948px;position:relative;background:#fff}
+.v59-time-axis{position:relative;height:1440px;background:#fafaf8;border-right:1px solid var(--line)}
+.v59-hour{position:absolute;left:0;right:0;height:60px;border-top:1px solid #ecece9}
+.v59-hour span{position:absolute;top:-7px;right:6px;font-size:9px;color:#9a9a96;font-weight:700}
+.v59-day{position:relative;height:1440px;border-right:1px solid #ecece9;background:repeating-linear-gradient(to bottom,transparent 0,transparent 59px,#ecece9 60px)}
+.v59-day.today{background-color:#fcfcff}
+.v59-day.selected{box-shadow:inset 0 0 0 2px var(--accent)}
+.v59-day-head{position:sticky;top:0;z-index:5;width:100%;height:56px;background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:8px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.v59-day-head span{font-size:11px;color:var(--muted);font-weight:800}.v59-day-head b{font-size:12px}
+.v59-add{position:sticky;top:56px;z-index:4;width:calc(100% - 10px);margin:5px;border:1px dashed #d8d8d4;background:rgba(255,255,255,.9);border-radius:9px;padding:6px;font-size:10px;font-weight:800;color:var(--accent)}
+.v59-track{position:absolute;left:0;right:0;top:0;height:1440px}
+.v59-block{position:absolute;left:5px;width:calc(100% - 10px);border:0;border-radius:9px;padding:5px 6px;text-align:left;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:10px;font-weight:800;box-shadow:0 3px 12px rgba(20,20,25,.08);z-index:2}
+.v59-block-time{font-size:8px;opacity:.72;white-space:nowrap}.v59-block b{font-size:10px;line-height:1.15}.v59-block strong{font-size:9px;margin-top:auto}
+.v59-shift{background:#eeecff;color:#5149b9;border-left:3px solid var(--accent)}.v59-task{background:#eaf7ef;color:#287247;border-left:3px solid #58a56c}.v59-event{background:#fff2dd;color:#99661d;border-left:3px solid #e7a83e}
+.v59-now{position:absolute;left:0;right:0;height:2px;background:#e05b5b;z-index:4;pointer-events:none}.v59-now i{position:absolute;left:-2px;top:-4px;width:10px;height:10px;border-radius:50%;background:#e05b5b}
+.v59-legend{display:flex;gap:12px;flex-wrap:wrap;padding:10px 2px;font-size:10px;color:var(--muted)}.v59-legend span{display:flex;align-items:center;gap:4px}.v59-legend i{display:inline-block;width:7px;height:7px;border-radius:50%}
+.v59-leg-shift{background:var(--accent)}.v59-leg-task{background:#58a56c}.v59-leg-event{background:#e7a83e}.v59-leg-now{background:#e05b5b}
+@media(max-width:390px){.v59-week{grid-template-columns:46px repeat(7,116px);min-width:858px}.v59-block{left:4px;width:calc(100% - 8px);padding:4px}.v59-block b{font-size:9px}}
 </style></head>
 <body>
 <div class="app">
@@ -2162,6 +2184,52 @@ function renderCalendar(){
  }
  if(mode==='week'){
    const base=dateObj(selected), day=base.getDay()||7;
+   base.setDate(base.getDate()-day+1);
+   const days=Array.from({length:7},(_,i)=>{const d=new Date(base);d.setDate(base.getDate()+i);return d.toISOString().slice(0,10)});
+   const dayNames=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+   const today=todayISO();
+   const dayCol=(d,idx)=>{
+     const items=[];
+     (data.shifts||[]).forEach(s=>{
+       const sd=s.date, st=minutesFromTime(shiftStart(s)), en0=minutesFromTime(shiftEnd(s));
+       if(st==null||en0==null)return;
+       if(sd===d){
+         let en=en0<=st?1440:en0;
+         items.push({kind:'shift',id:s.id,start:st,end:Math.min(en,1440),title:employerById(s.employerId||s.employer)?.name||'Смена',meta:(shiftStart(s)||'')+'–'+(shiftEnd(s)||''),value:shiftIncome(s)});
+       }else if(sd===addDaysISO(d,-1) && en0<=st){
+         items.push({kind:'shift',id:s.id,start:0,end:Math.min(en0,1440),title:employerById(s.employerId||s.employer)?.name||'Смена',meta:'до '+(shiftEnd(s)||''),value:shiftIncome(s)});
+       }
+     });
+     (data.events||[]).filter(e=>e.date===d&&e.time).forEach(e=>{
+       const st=minutesFromTime(e.time);if(st!=null)items.push({kind:'event',id:e.id,start:st,end:Math.min(st+60,1440),title:e.title,meta:eventCategoryLabel(e.category)});
+     });
+     (data.tasks||[]).filter(t=>t.date===d&&t.time&&!t.done).forEach(t=>{
+       const st=minutesFromTime(t.time);if(st!=null)items.push({kind:'task',id:t.id,start:st,end:Math.min(st+45,1440),title:t.title,meta:taskCategoryLabel(t.category)});
+     });
+     const totalNet=dayNet(d).net;
+     const blocks=items.map(i=>{
+       const top=i.start, height=Math.max(42,i.end-i.start);
+       const cls=i.kind==='shift'?'v59-shift':i.kind==='task'?'v59-task':'v59-event';
+       const icon=i.kind==='shift'?'▣':i.kind==='task'?'✓':'◷';
+       const click=i.kind==='shift'?"openShift('"+i.id+"')":i.kind==='task'?"openTask('"+i.id+"')":"openEvent('"+i.id+"')";
+       return '<button class="v59-block '+cls+'" style="top:'+top+'px;height:'+height+'px" onclick="'+click+'"><span class="v59-block-time">'+esc(i.meta)+'</span><b>'+icon+' '+esc(i.title)+'</b>'+(i.value!=null?'<strong>'+money(i.value)+'</strong>':'')+'</button>';
+     }).join('');
+     const isToday=d===today;
+     const nowLine=isToday?'<div class="v59-now" style="top:'+(new Date().getHours()*60+new Date().getMinutes())+'px"><i></i></div>':'';
+     return '<div class="v59-day '+(isToday?'today':'')+' '+(d===selected?'selected':'')+'">'+
+       '<button class="v59-day-head" onclick="selectCalendarDate(\''+d+'\');state.calendarMode=\'day\';window.calendarMode=\'day\';renderCalendar()"><span>'+dayNames[idx]+' · '+formatShortDate(d)+'</span><b>'+money(totalNet)+'</b></button>'+
+       '<button class="v59-add" onclick="event.stopPropagation();openShift(null,\''+d+'\')">＋ Смена</button>'+
+       '<div class="v59-track">'+nowLine+blocks+'</div></div>';
+   };
+   const hours=Array.from({length:25},(_,i)=>'<div class="v59-hour" style="top:'+(i*60)+'px"><span>'+String(i).padStart(2,'0')+':00</span></div>').join('');
+   root.innerHTML=nav('Неделя',formatShortDate(days[0])+' — '+formatShortDate(days[6]))+switcher+
+     '<div class="v59-week-note">00:00–24:00 · нажмите на смену, задачу или событие, чтобы изменить</div>'+
+     '<div class="v59-week-scroll"><div class="v59-week"><div class="v59-time-axis">'+hours+'</div>'+days.map((d,i)=>dayCol(d,i)).join('')+'</div></div>'+
+     '<div class="v59-legend"><span><i class="v59-leg-shift"></i>Смены</span><span><i class="v59-leg-task"></i>Задачи</span><span><i class="v59-leg-event"></i>События</span><span><i class="v59-leg-now"></i>Сейчас</span></div>'+
+     '<div class="v46-quick"><button onclick="calendarMove(-1)">‹ Неделя</button><button onclick="selectCalendarDate(todayISO());state.calendarMode=\'week\';window.calendarMode=\'week\';renderCalendar()">Сегодня</button><button onclick="calendarMove(1)">Следующая неделя ›</button></div>';
+   return;
+ }
+ const base=dateObj(selected), day=base.getDay()||7;
    base.setDate(base.getDate()-day+1);
    const days=Array.from({length:7},(_,i)=>{const d=new Date(base);d.setDate(base.getDate()+i);return d.toISOString().slice(0,10)});
    root.innerHTML=`${nav('Неделя',`${formatShortDate(days[0])} — ${formatShortDate(days[6])}`)}${switcher}
