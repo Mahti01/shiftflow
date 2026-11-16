@@ -2215,6 +2215,15 @@ function renderCalendar(){
        const st=minutesFromTime(t.time);if(st!=null)items.push({kind:'task',id:t.id,start:st,end:Math.min(st+45,1440),title:t.title,meta:taskCategoryLabel(t.category)});
      });
      const totalNet=dayNet(d).net;
+     const occupied=items.map(i=>({start:i.start,end:i.end})).sort((a,b)=>a.start-b.start);
+     const free=[];
+     let cursor=0;
+     occupied.forEach(o=>{if(o.start>cursor)free.push({start:cursor,end:o.start});cursor=Math.max(cursor,o.end);});
+     if(cursor<1440)free.push({start:cursor,end:1440});
+     const freeHtml=free.filter(f=>f.end-f.start>=30).map(f=>{
+       const h=Math.max(24,f.end-f.start);
+       return '<button class="v60-free" style="top:'+f.start+'px;height:'+h+'px" onclick="event.stopPropagation();openTask(null,\''+d+'\');setTimeout(function(){var el=document.getElementById(\'task-time\');if(el)el.value=\''+timeFromMinutes(f.start)+'\';},0)"><span>Свободно · '+freeTimeLabel(f.end-f.start)+'</span></button>';
+     }).join('');
      const blocks=items.map(i=>{
        const top=i.start, height=Math.max(42,i.end-i.start);
        const cls=i.kind==='shift'?'v59-shift':i.kind==='task'?'v59-task':'v59-event';
@@ -2227,7 +2236,7 @@ function renderCalendar(){
      return '<div class="v59-day '+(isToday?'today':'')+' '+(d===selected?'selected':'')+'">'+
        '<button class="v59-day-head" onclick="selectCalendarDate(\''+d+'\');state.calendarMode=\'day\';window.calendarMode=\'day\';renderCalendar()"><span>'+dayNames[idx]+' · '+formatShortDate(d)+'</span><b>'+money(totalNet)+'</b></button>'+
        '<button class="v59-add" onclick="event.stopPropagation();openShift(null,\''+d+'\')">＋ Смена</button>'+
-       '<div class="v59-track">'+nowLine+blocks+'</div></div>';
+       '<div class="v59-track">'+freeHtml+nowLine+blocks+'</div></div>';
    };
    const hours=Array.from({length:25},(_,i)=>'<div class="v59-hour" style="top:'+(i*60)+'px"><span>'+String(i).padStart(2,'0')+':00</span></div>').join('');
    root.innerHTML=nav('Неделя',formatShortDate(days[0])+' — '+formatShortDate(days[6]))+switcher+
